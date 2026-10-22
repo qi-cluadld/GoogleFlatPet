@@ -23,11 +23,11 @@
 
 try { Add-Type -AssemblyName System.IO.MemoryMappedFiles -ErrorAction Stop } catch { }
 
-$script:PetSocialMmfName = 'DesktopPets.Interop.v6'
-$script:PetSocialCapacity = 768
+$script:PetSocialMmfName = 'DesktopPets.Interop.v9'
+$script:PetSocialCapacity = 1024
 $script:PetSocialSlotSize = 64
-$script:PetSocialIds = @{ 'gemini' = 0; 'deepseek' = 1; 'chatgpt' = 2; 'claude' = 3; 'doubao' = 4; 'qwen' = 5; 'copilot' = 6; 'glm' = 7; 'grok' = 8; 'apple' = 9; 'google_g' = 10; 'google_flat' = 11 }
-$script:PetSocialNames = @{ 'gemini' = '小星星'; 'deepseek' = '小鲸鱼'; 'chatgpt' = '小花'; 'claude' = '小太阳'; 'doubao' = '小豆包'; 'qwen' = '小千'; 'copilot' = '小飞'; 'glm' = '小象'; 'grok' = '小格'; 'apple' = '小智'; 'google_g' = '小谷'; 'google_flat' = '小彩' }
+$script:PetSocialIds = @{ 'gemini' = 0; 'deepseek' = 1; 'chatgpt' = 2; 'claude' = 3; 'doubao' = 4; 'qwen' = 5; 'copilot' = 6; 'glm' = 7; 'grok' = 8; 'apple' = 9; 'google_g' = 10; 'google_flat' = 11; 'google_old' = 12; 'apple_logo' = 13; 'win7' = 14; 'win10' = 15 }
+$script:PetSocialNames = @{ 'gemini' = '小星星'; 'deepseek' = '小鲸鱼'; 'chatgpt' = '小花'; 'claude' = '小太阳'; 'doubao' = '小豆包'; 'qwen' = '小千'; 'copilot' = '小飞'; 'glm' = '小象'; 'grok' = '小格'; 'apple' = '小智'; 'google_g' = '小谷'; 'google_flat' = '小彩'; 'google_old' = '老谷歌'; 'apple_logo' = '小苹'; 'win7' = '小七'; 'win10' = '小十' }
 $script:PetSocialBitAlive = 1
 $script:PetSocialBitPlay = 2
 $script:PetSocialBitSleep = 4
@@ -133,7 +133,7 @@ function Connect-PetSocial {
     $script:PetSocialTalkKind = $script:PetSocialTalkNone
     $script:PetSocialTalkTo = -1
     $script:PetSocialTalkStamp = 0
-    $script:PetSocialSeenSeq = @{ 0 = 0; 1 = 0; 2 = 0; 3 = 0; 4 = 0; 5 = 0; 6 = 0; 7 = 0; 8 = 0; 9 = 0; 10 = 0; 11 = 0 }
+    $script:PetSocialSeenSeq = @{ 0 = 0; 1 = 0; 2 = 0; 3 = 0; 4 = 0; 5 = 0; 6 = 0; 7 = 0; 8 = 0; 9 = 0; 10 = 0; 11 = 0; 12 = 0; 13 = 0; 14 = 0; 15 = 0 }
     $script:PetSocialConvo = $null
     $script:PetSocialConvoUntil = -99.0
     $script:PetSocialPending = $null
@@ -153,7 +153,7 @@ function Connect-PetSocial {
     $script:PetBattleWith = ''; $script:PetBattleNextAt = 0.0; $script:PetBattleSeen = @{}; $script:PetBattleEndAt = 0.0; $script:PetBattleCooldown = -999.0
     $script:PetSocialLastAngerDecay = 0.0
     Import-PetSocialLines -Defaults $Hooks.Lines -JsonPath $LinesPath | Out-Null
-    Write-PetLog "联动: 已连接 v3(槽位 $($script:PetSocialSelfIdx), 名字 $($script:PetSocialNames[$SelfId]))"
+    Write-PetLog "联动: 已连接 v9(槽位 $($script:PetSocialSelfIdx), 名字 $($script:PetSocialNames[$SelfId]))"
     return $true
 }
 
@@ -474,7 +474,7 @@ $script:PetLanPort = 45678
 $script:PetLanFolder = @{
     gemini = 'GeminiPet'; deepseek = 'DeepSeekPet'; chatgpt = 'ChatGPTPet'; claude = 'ClaudePet'
     doubao = 'DoubaoPet'; qwen = 'QwenPet'; copilot = 'CopilotPet'; glm = 'GLMPet'
-    grok = 'GrokPet'; apple = 'ApplePet'; google_g = 'GoogleGPet'; google_flat = 'GoogleFlatPet'
+    grok = 'GrokPet'; apple = 'ApplePet'; google_g = 'GoogleGPet'; google_flat = 'GoogleFlatPet'; google_old = 'GoogleOldPet'; apple_logo = 'AppleLogoPet'; win7 = 'Win7Pet'; win10 = 'Win10Pet'
 }
 function Start-PetLan {
     $script:PetLanLastSend = 0.0
@@ -587,6 +587,7 @@ function Update-PetBattle {
         Say-PetSocialTalk -Kind 'Win' -ToId $N.Id -KindCode $script:PetSocialTalkNone 2.8 | Out-Null
         if ($script:PetSocialHooks.Play) { try { & $script:PetSocialHooks.Play $N } catch { } }
         Write-PetLog "对战: 赢了 $($N.Id)!"
+        $script:PetBattleState = 2      # 标记已结束, 防止每帧重复结算(刷屏)
         $script:PetBattleEndAt = $Now + 1.5
         return $true
     }

@@ -1,4 +1,4 @@
-﻿' USB auto-backup watcher - silent launcher (no console window)
+' USB auto-backup watcher - silent launcher (no console window)
 Option Explicit
 Dim sh, fso, base
 Set sh = CreateObject("WScript.Shell")
